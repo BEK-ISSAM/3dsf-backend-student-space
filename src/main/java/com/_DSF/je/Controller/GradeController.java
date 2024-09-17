@@ -1,6 +1,7 @@
 package com._DSF.je.Controller;
 
 import com._DSF.je.Entity.Grade;
+import com._DSF.je.Entity.GradeRequest;
 import com._DSF.je.Service.GradeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,8 +35,8 @@ public class GradeController {
         return gradeService.createGrade(grade);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Grade> updateGrade(@PathVariable Long id, @RequestBody Grade grade) {
+    @PatchMapping("/{id}")
+    public ResponseEntity<Grade> updateGrade(@PathVariable Long id, @RequestBody GradeRequest grade) {
         Grade updatedGrade = gradeService.updateGrade(id, grade);
         return updatedGrade != null ? ResponseEntity.ok(updatedGrade) : ResponseEntity.notFound().build();
     }
@@ -45,4 +46,11 @@ public class GradeController {
         gradeService.deleteGrade(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/student/{studentId}/quiz/{quizId}")
+    public ResponseEntity<Grade> getGradeByStudentAndQuiz(@PathVariable Long studentId, @PathVariable Long quizId) {
+        Grade grade = gradeService.getGradeByStudentAndQuiz(studentId, quizId);
+        return grade != null ? ResponseEntity.ok(grade) : ResponseEntity.notFound().build();
+    }
+
 }

@@ -3,7 +3,9 @@ package com._DSF.je.Controller;
 import com._DSF.je.Entity.Category;
 import com._DSF.je.Entity.Course;
 import com._DSF.je.Service.CourseService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,25 +26,26 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-
-
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Course> createCourse(
+    public ResponseEntity<?> createCourse(
             @RequestParam("course") String courseJson,
             @RequestParam("pdfFile") MultipartFile pdfFile) {
         try {
-            // Convert the JSON string to a Course object
             ObjectMapper objectMapper = new ObjectMapper();
             Course course = objectMapper.readValue(courseJson, Course.class);
 
-            // Save the course with the file
             Course createdCourse = courseService.createCourse(course, pdfFile);
             return ResponseEntity.ok(createdCourse);
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.badRequest().body("Invalid course JSON format: " + e.getMessage());
         } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("Error processing file or JSON data: " + e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
         }
     }
-
 
     @GetMapping
     public ResponseEntity<List<Course>> getAllCourses() {
@@ -91,5 +94,10 @@ public class CourseController {
             @RequestParam(required = false, defaultValue = "asc") String sortOrder) {
         List<Course> courses = courseService.filterByPrice(minPrice, maxPrice, sortOrder);
         return ResponseEntity.ok(courses);
+    }
+
+    @GetMapping("/{id}/download-pdf")
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id) {
+        return courseService.getPdfFile(id);
     }
 }

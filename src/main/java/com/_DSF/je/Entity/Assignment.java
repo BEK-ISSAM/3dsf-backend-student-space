@@ -25,5 +25,6 @@ public class Assignment {
     private Course course;
 
     @OneToMany(mappedBy = "assignment")
+    @JsonManagedReference
     private Set<Grade> grades;
 }

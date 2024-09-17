@@ -20,8 +20,14 @@ public class Qcm {
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "grade_id")
     private Grade grade;
+
+    @Lob
+    private byte[] imageData;
+
+    private String imageName;
+    private String imageType;
 }
 

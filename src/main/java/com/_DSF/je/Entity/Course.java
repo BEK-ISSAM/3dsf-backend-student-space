@@ -31,9 +31,11 @@ public class Course {
     private Set<Assignment> assignments;
 
     @OneToMany(mappedBy = "course")
+    @JsonManagedReference
     private Set<Quiz> quizzes;
 
     @OneToMany(mappedBy = "course")
+    @JsonManagedReference
     private Set<Video> videos;
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -50,5 +52,10 @@ public class Course {
     private double price;
     private String description;
     @OneToMany(mappedBy = "course")
+    @JsonManagedReference
     private Set<FAQ> faqs;
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] thumbnail;
 }
